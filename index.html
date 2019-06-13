@@ -1,0 +1,66 @@
+<html>
+
+<body bgcolor="#000000">
+<!DOCTYPE html>
+<body>
+
+<style>
+
+p { 
+font-size:300%;
+color:black;
+}
+body { 
+color:green;
+}
+</style>
+
+<p>CSRF with javascript workers</p>
+<script>
+
+//Enter array here
+array = [""]
+
+//Change slices depending on how many array
+//Recommend getting these via burp sequencer
+var slice1 = array.slice(0,10);
+var slice2 = array.slice(11,20);
+var slice3 = array.slice(21,array.length);
+
+thebody = document.querySelector('body');
+
+
+//Each one of these is a thread
+
+//Create worker
+w = new Worker("worker.js");
+
+//Listen for responses from the worker
+w.addEventListener('message', function(event) {
+  thebody.innerHTML += ("<br>");
+  //Probably bad code here, but this writing attempts to the screen (green text, of course)
+  thebody.innerHTML += "[Worker 0] : " + event.data;
+}, false);
+
+w1 = new Worker("worker.js");
+w1.addEventListener('message', function(event) {
+  thebody.innerHTML += ("<br>");   
+  thebody.innerHTML += "[Worker 1] : " + event.data;
+}, false);
+
+w2 = new Worker("worker.js");
+w2.addEventListener('message', function(event) {
+  thebody.innerHTML += ("<br>");   
+  thebody.innerHTML += "[Worker 2] : " + event.data;
+}, false);
+
+//Start Workers
+//Key Value pair
+w.postMessage({ 'array' : slice1 });
+w1.postMessage({ 'array' : slice2 });
+w2.postMessage({ 'array' : slice3 });
+
+</script>
+
+</body>
+</html>
